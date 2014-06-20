@@ -1,0 +1,7 @@
+# system check : check qnx and pre-installed software
+# jsk check (check_all) : check code in start-jsk (openrtm,openhrp3,hrpsys)
+
+CONVENTION:
+ system check code start from qnx-*-.sh (qnx native code) or robot-*-sh ( manufacturer code)
+
+
