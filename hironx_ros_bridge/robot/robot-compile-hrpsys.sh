@@ -6,7 +6,8 @@ function usage {
     exit 0
 }
 
-trap 'exit 1' ERR;
+PID=$$ 
+trap 'rm /tmp/*-$PID.zip;exit 1' ERR;
 
 # command line parse
 OPT=`getopt -o h -l help -- $*`
@@ -24,7 +25,6 @@ while [ -n "$1" ] ; do
     esac
 done
 
-
 HOSTNAME=${1-"hiro014"}
 USERID=${2-"hiro"}
 HRPSYS_VERSION=${3-"315.1.10"}
@@ -32,7 +32,7 @@ HRPSYS_VERSION=${3-"315.1.10"}
 
 DATE=`date +%Y-%m-%d`
 
-wget https://github.com/fkanehiro/hrpsys-base/archive/${HRPSYS_VERSION}.zip -O /tmp/hrpsys-base-${HRPSYS_VERSION}.zip || echo "ERROR:: Failed to download source code"
+wget https://github.com/fkanehiro/hrpsys-base/archive/${HRPSYS_VERSION}.zip -O /tmp/hrpsys-base-${HRPSYS_VERSION}-${PID}.zip || echo "ERROR:: Failed to download source code"
 (cd ../; tar -cvzf /tmp/hironx-robot-script-$DATE.tgz robot/Makefile robot/*.in robot/*.sav)
 
 commands="
@@ -43,8 +43,8 @@ commands="
   echo \"* Download hrpsys *\";
   mkdir -p /tmp/hrpsys-source-${HRPSYS_VERSION}-${DATE}/src;
   cd /tmp/hrpsys-source-${HRPSYS_VERSION}-${DATE}/src;
-  mv /tmp/hrpsys-base-$HRPSYS_VERSION.zip .;
-  unzip -o hrpsys-base-$HRPSYS_VERSION.zip ;
+  mv /tmp/hrpsys-base-$HRPSYS_VERSION-$PID.zip .;
+  unzip -o hrpsys-base-$HRPSYS_VERSION-$PID.zip ;
   echo \"* Install hrpsys source *\";
   rm -fr /opt/jsk/src;
   mkdir -p /opt/jsk/src;
@@ -72,7 +72,7 @@ commands="
 echo "comands = $commands"
 read -p "execute compile command @ $HOSTNAME (y/n)? "
 if [ "$REPLY" == "y" ]; then
-    scp /tmp/hrpsys-base-${HRPSYS_VERSION}.zip /tmp/hironx-robot-script-$DATE.tgz $USERID@$HOSTNAME:/tmp/
+    scp /tmp/hrpsys-base-${HRPSYS_VERSION}-${PID}.zip /tmp/hironx-robot-script-$DATE.tgz $USERID@$HOSTNAME:/tmp/
     ssh $USERID@$HOSTNAME -t $commands 2>&1 | tee /tmp/robot-compile-hrpsys-`date +"%Y%m%d-%H%M%S"`.log
     echo "====="
     echo "$ tar -xvzf /tmp/hrpsys-${HRPSYS_VERSION}-qnx-${DATE}; cd hrpsys-source-${HRPSYS_VERSION}-${DATE}/build; make install"
