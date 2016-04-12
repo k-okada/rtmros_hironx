@@ -42,6 +42,7 @@ before_install: # Use this to prepare the system to install prerequisites or dep
   - export ROS_PARALLEL_JOBS="-j1 -l1"
   - echo "Testing branch $TRAVIS_BRANCH of $REPOSITORY_NAME"
   - env | grep PATH
+  - env | grep USE
   - echo "deb $ROS_REPOSITORY_PATH trusty main" | sudo tee /etc/apt/sources.list.d/ros-latest.list && echo 'Content of /etc/apt/sources.list.d/ros-latest.list\n' && cat /etc/apt/sources.list.d/ros-latest.list
   - wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
   - sudo apt-get update -qq
